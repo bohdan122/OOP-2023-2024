@@ -1,34 +1,99 @@
 package src;
 
+import java.util.ArrayList;
+
 public class Main {
+
+    public abstract static class Product {
+        private String name;
+        private double price;
+
+        public Product(String name, double price) {
+            this.name = name;
+            this.price = price;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public abstract double getDiscount();
+    }
+
+    public static class FoodProduct extends Product {
+        public FoodProduct(String name, double price) {
+            super(name, price);
+        }
+
+        @Override
+        public double getDiscount() {
+            return 0;
+        }
+    }
+
+    public static class ElectronicsProduct extends Product {
+        public ElectronicsProduct(String name, double price) {
+            super(name, price);
+        }
+
+        @Override
+        public double getDiscount() {
+            return getPrice() * 0.15;
+        }
+    }
+
+    public static class ShoppingCart {
+        private ArrayList<Product> products;
+        private double total;
+
+        public ShoppingCart() {
+            products = new ArrayList<>();
+            total = 0;
+        }
+
+        public void addProduct(Product product) {
+            products.add(product);
+            total += product.getPrice();
+        }
+
+        public double calculateTotalDiscount() {
+            double totalDiscount = 0;
+            for (Product product : products) {
+                totalDiscount += product.getDiscount();
+            }
+            return totalDiscount;
+        }
+
+        public void displayCart() {
+            System.out.println("Shopping Cart:");
+            for (Product product : products) {
+                double discount = product.getDiscount();
+                System.out.println(product.getName() + ": $" + product.getPrice() + " (Discount: $" + discount + ")");
+            }
+            double totalDiscount = calculateTotalDiscount();
+            double finalTotal = total - totalDiscount;
+            System.out.println("Total price: $" + total);
+            System.out.println("Total discount: $" + totalDiscount);
+            System.out.println("Final total: $" + finalTotal);
+        }
+    }
+
     public static void main(String[] args) {
-        String[] productNames = { "Apple", "Banana", "Orange", "Laptop", "Smartphone" };
-        double[] prices = { 1.25, 0.75, 1.50, 999.99, 799.99 };
-        boolean[] isFood = { true, true, true, false, false };
-        double total = 0;
+        ShoppingCart cart = new ShoppingCart();
 
-        System.out.println("Available products:");
-        for (int i = 0; i < productNames.length; i++) {
-            System.out.println(productNames[i] + ": $" + prices[i] + " (Food: " + isFood[i] + ")");
-        }
+        FoodProduct apple = new FoodProduct("Apple", 1.25);
+        FoodProduct banana = new FoodProduct("Banana", 0.75);
+        ElectronicsProduct laptop = new ElectronicsProduct("Laptop", 999.99);
+        ElectronicsProduct smartphone = new ElectronicsProduct("Smartphone", 799.99);
 
-        System.out.println("User buys: Apple, Laptop and Smartphone");
-        total += prices[0];
-        total += prices[3];
-        total += prices[4];
+        cart.addProduct(apple);
+        cart.addProduct(laptop);
+        cart.addProduct(smartphone);
 
-        System.out.println("Total price: $" + total);
-
-        double electronicsDiscount = 0;
-        if (!isFood[3]) {
-            electronicsDiscount += prices[3] * 0.15;
-        }
-        if (!isFood[4]) {
-            electronicsDiscount += prices[4] * 0.15;
-        }
-
-        total -= electronicsDiscount;
-        System.out.println("Electronics discount: $" + electronicsDiscount);
-        System.out.println("Final total: $" + total);
+        cart.displayCart();
     }
 }
